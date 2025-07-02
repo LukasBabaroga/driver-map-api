@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Driver Map</title>
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+  <!-- Google Maps API (zameniti YOUR_API_KEY) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    async function initMap() {
+      const response = await fetch("http://127.0.0.1:5000/drivers");
+      const drivers = await response.json();
+
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 4,
+        center: { lat: 39.8283, lng: -98.5795 }, // centar SAD
+      });
+
+      const geocoder = new google.maps.Geocoder();
+
+      for (const driver of drivers) {
+        geocoder.geocode({ address: driver.location }, (results, status) => {
+          if (status === "OK") {
+            const color = driver.is_available ? "green" : "red";
+
+            const marker = new google.maps.Marker({
+              map: map,
+              position: results[0].geometry.location,
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: color,
+                fillOpacity: 1,
+                strokeWeight: 1
+              }
+            });
+
+            const infoContent = `
+              <strong>${driver.name}</strong><br>
+              Lokacija: ${driver.location}<br>
+              Dimenzije: ${driver.dimensions}<br>
+              Specifikacije: ${driver.specifications}<br>
+              ${
+                driver.is_available
+                  ? '<b style="color:green;">Dostupan</b>'
+                  : `<b style="color:red;">Nije dostupan</b><br>Dostupan od: ${driver.available_date}<br>Naredna lokacija: ${driver.next_location}`
+              }
+            `;
+
+            const infowindow = new google.maps.InfoWindow({ content: infoContent });
+
+            marker.addListener("click", () => {
+              infowindow.open(map, marker);
+            });
+
+          } else {
+            console.error("Geocode error:", status);
+          }
+        });
+      }
+    }
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>
