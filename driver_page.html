@@ -8,46 +8,49 @@
   <button onclick="startTracking()">Start Tracking</button>
   <button onclick="stopTracking()">Stop Tracking</button>
   <p id="status">Status: Waiting</p>
+  <p id="coords">Coords: not yet</p>
 
   <script>
     let intervalId;
 
+    // Čitanje ID-a iz URL-a
     const urlParams = new URLSearchParams(window.location.search);
     const driverId = urlParams.get('id') || 1;
 
     function startTracking() {
-  document.getElementById("status").innerText = "Status: Tracking...";
-  intervalId = setInterval(() => {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      // Dodaj ispis na ekranu
-      document.getElementById("coords").innerText = `Coords: ${position.coords.latitude}, ${position.coords.longitude}`;
+      document.getElementById("status").innerText = "Status: Tracking...";
+      intervalId = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          // Prikaz na ekranu
+          document.getElementById("coords").innerText = `Coords: ${position.coords.latitude}, ${position.coords.longitude}`;
 
-      console.log("LAT:", position.coords.latitude, "LNG:", position.coords.longitude);
+          // Ispis u konzolu
+          console.log("LAT:", position.coords.latitude, "LNG:", position.coords.longitude);
 
-      const data = {
-        id: driverId,
-        location: `${position.coords.latitude},${position.coords.longitude}`
-      };
+          const data = {
+            id: driverId,
+            location: `${position.coords.latitude},${position.coords.longitude}`
+          };
 
-      await fetch('/update_location', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+          await fetch('/update_location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
 
-      console.log("Location sent:", data);
-    }, (error) => {
-      console.error("Error getting location", error);
-    }, {
-      enableHighAccuracy: true
-    });
-  }, 5000);
-}
+          console.log("Location sent:", data);
+        }, (error) => {
+          console.error("Error getting location", error);
+          document.getElementById("coords").innerText = "Coords: error getting location";
+        }, {
+          enableHighAccuracy: true
+        });
+      }, 5000);
+    }
 
     function stopTracking() {
       clearInterval(intervalId);
       document.getElementById("status").innerText = "Status: Stopped";
-      console.log("Tracking stopped");
     }
   </script>
 </body>
