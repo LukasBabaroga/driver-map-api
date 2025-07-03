@@ -50,5 +50,13 @@ def serve_index():
 def serve_driver_page():
     return send_from_directory('.', 'driver_page.html')
 
+@app.route('/debug_drivers')
+def debug_drivers():
+    conn = get_db_connection()
+    drivers = conn.execute("SELECT id, name, location FROM drivers").fetchall()
+    conn.close()
+    return jsonify([dict(d) for d in drivers])
+
+
 if __name__ == '__main__':
     app.run(debug=True)
