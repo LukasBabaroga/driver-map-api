@@ -46,5 +46,9 @@ def serve_index():
     return send_from_directory('.', 'index.html')
 
 
+@app.route('/driver_page.html')
+def serve_driver_page():
+    return send_from_directory('.', 'driver_page.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
