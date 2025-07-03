@@ -16,24 +16,26 @@
     const driverId = urlParams.get('id') || 1;
 
     function startTracking() {
-      document.getElementById("status").innerText = "Status: Tracking...";
-      intervalId = setInterval(() => {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const data = {
-            id: driverId,
-            location: `${position.coords.latitude},${position.coords.longitude}`
-          };
+  document.getElementById("status").innerText = "Status: Tracking...";
+  intervalId = setInterval(() => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      console.log("LAT:", position.coords.latitude, "LNG:", position.coords.longitude); // dodaj ovo
 
-          await fetch('/update_location', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
+      const data = {
+        id: driverId,
+        location: `${position.coords.latitude},${position.coords.longitude}`
+      };
 
-          console.log("Location sent:", data);
-        });
-      }, 5000);
-    }
+      await fetch('/update_location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      console.log("Location sent:", data);
+    });
+  }, 5000);
+}
 
     function stopTracking() {
       clearInterval(intervalId);
