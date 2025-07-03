@@ -19,8 +19,8 @@
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 4,
-        center: { lat: 39.8283, lng: -98.5795 },
+        zoom: 6,
+        center: { lat: 44.0, lng: 21.0 }, // centar Srbije
       });
 
       loadAndUpdateMarkers();
@@ -32,7 +32,7 @@
       const drivers = await response.json();
 
       for (const driver of drivers) {
-        if (!driver.location.includes(",")) continue; // preskoči ako lokacija nije lat,lng
+        if (!driver.location.includes(",")) continue;
 
         const [lat, lng] = driver.location.split(",").map(Number);
         const position = { lat, lng };
