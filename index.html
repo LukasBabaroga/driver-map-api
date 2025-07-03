@@ -8,64 +8,46 @@
       width: 100%;
     }
   </style>
-  <!-- Google Maps API (zameniti YOUR_API_KEY) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJhCN7kwF7Jn0pnIr3CeDOBbVSphN8X4k"></script>
 </head>
 <body>
   <div id="map"></div>
 
   <script>
-    async function initMap() {
-      const response = await fetch("/drivers");
+    let map;
+    let markers = {};
 
-      const drivers = await response.json();
-
-      const map = new google.maps.Map(document.getElementById("map"), {
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
         zoom: 4,
-        center: { lat: 39.8283, lng: -98.5795 }, // centar SAD
+        center: { lat: 39.8283, lng: -98.5795 },
       });
 
-      const geocoder = new google.maps.Geocoder();
+      loadAndUpdateMarkers();
+      setInterval(loadAndUpdateMarkers, 3000); // refresh na 3 sekunde
+    }
+
+    async function loadAndUpdateMarkers() {
+      const response = await fetch("/drivers");
+      const drivers = await response.json();
 
       for (const driver of drivers) {
-        geocoder.geocode({ address: driver.location }, (results, status) => {
-          if (status === "OK") {
-            const color = driver.is_available ? "green" : "red";
+        if (!driver.location.includes(",")) continue; // preskoči ako lokacija nije lat,lng
 
-            const marker = new google.maps.Marker({
-              map: map,
-              position: results[0].geometry.location,
-              icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: color,
-                fillOpacity: 1,
-                strokeWeight: 1
-              }
-            });
+        const [lat, lng] = driver.location.split(",").map(Number);
+        const position = { lat, lng };
 
-            const infoContent = `
-              <strong>${driver.name}</strong><br>
-              Lokacija: ${driver.location}<br>
-              Dimenzije: ${driver.dimensions}<br>
-              Specifikacije: ${driver.specifications}<br>
-              ${
-                driver.is_available
-                  ? '<b style="color:green;">Dostupan</b>'
-                  : `<b style="color:red;">Nije dostupan</b><br>Dostupan od: ${driver.available_date}<br>Naredna lokacija: ${driver.next_location}`
-              }
-            `;
+        if (markers[driver.id]) {
+          markers[driver.id].setPosition(position);
+        } else {
+          const marker = new google.maps.Marker({
+            map: map,
+            position: position,
+            label: driver.name[0],
+          });
 
-            const infowindow = new google.maps.InfoWindow({ content: infoContent });
-
-            marker.addListener("click", () => {
-              infowindow.open(map, marker);
-            });
-
-          } else {
-            console.error("Geocode error:", status);
-          }
-        });
+          markers[driver.id] = marker;
+        }
       }
     }
 

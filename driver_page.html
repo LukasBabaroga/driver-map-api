@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Driver Tracker</title>
+</head>
+<body>
+  <h2>Driver tracking page</h2>
+  <button onclick="startTracking()">Start Tracking</button>
+  <p id="status">Status: Waiting</p>
+
+  <script>
+    let intervalId;
+
+    function startTracking() {
+      document.getElementById("status").innerText = "Status: Tracking...";
+      intervalId = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const data = {
+            id: 1, // ID vozača
+            location: `${position.coords.latitude},${position.coords.longitude}`
+          };
+
+          await fetch('/update_location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          console.log("Location sent:", data.location);
+        });
+      }, 5000); // šalje svakih 5 sekundi
+    }
+  </script>
+</body>
+</html>
