@@ -11,12 +11,16 @@
   <script>
     let intervalId;
 
+    // Pročitaj ID iz URL parametra
+    const urlParams = new URLSearchParams(window.location.search);
+    const driverId = urlParams.get('id') || 1; // default na 1
+
     function startTracking() {
       document.getElementById("status").innerText = "Status: Tracking...";
       intervalId = setInterval(() => {
         navigator.geolocation.getCurrentPosition(async (position) => {
           const data = {
-            id: 1, // ID vozača
+            id: driverId,
             location: `${position.coords.latitude},${position.coords.longitude}`
           };
 
@@ -26,9 +30,9 @@
             body: JSON.stringify(data)
           });
 
-          console.log("Location sent:", data.location);
+          console.log("Location sent:", data);
         });
-      }, 5000); // šalje svakih 5 sekundi
+      }, 5000);
     }
   </script>
 </body>
