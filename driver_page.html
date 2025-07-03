@@ -6,14 +6,14 @@
 <body>
   <h2>Driver tracking page</h2>
   <button onclick="startTracking()">Start Tracking</button>
+  <button onclick="stopTracking()">Stop Tracking</button>
   <p id="status">Status: Waiting</p>
 
   <script>
     let intervalId;
 
-    // Pročitaj ID iz URL parametra
     const urlParams = new URLSearchParams(window.location.search);
-    const driverId = urlParams.get('id') || 1; // default na 1
+    const driverId = urlParams.get('id') || 1;
 
     function startTracking() {
       document.getElementById("status").innerText = "Status: Tracking...";
@@ -33,6 +33,12 @@
           console.log("Location sent:", data);
         });
       }, 5000);
+    }
+
+    function stopTracking() {
+      clearInterval(intervalId);
+      document.getElementById("status").innerText = "Status: Stopped";
+      console.log("Tracking stopped");
     }
   </script>
 </body>
