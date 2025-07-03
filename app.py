@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
+import os
 from flask_cors import CORS
 import sqlite3
 
@@ -38,6 +39,12 @@ def get_drivers():
     drivers = conn.execute('SELECT * FROM drivers').fetchall()
     conn.close()
     return jsonify([dict(d) for d in drivers])
+
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

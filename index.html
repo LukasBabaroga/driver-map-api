@@ -16,7 +16,8 @@
 
   <script>
     async function initMap() {
-      const response = await fetch("http://127.0.0.1:5000/drivers");
+      const response = await fetch("/drivers");
+
       const drivers = await response.json();
 
       const map = new google.maps.Map(document.getElementById("map"), {
