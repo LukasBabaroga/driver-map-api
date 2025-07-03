@@ -19,7 +19,10 @@
   document.getElementById("status").innerText = "Status: Tracking...";
   intervalId = setInterval(() => {
     navigator.geolocation.getCurrentPosition(async (position) => {
-      console.log("LAT:", position.coords.latitude, "LNG:", position.coords.longitude); // dodaj ovo
+      // Dodaj ispis na ekranu
+      document.getElementById("coords").innerText = `Coords: ${position.coords.latitude}, ${position.coords.longitude}`;
+
+      console.log("LAT:", position.coords.latitude, "LNG:", position.coords.longitude);
 
       const data = {
         id: driverId,
@@ -33,6 +36,10 @@
       });
 
       console.log("Location sent:", data);
+    }, (error) => {
+      console.error("Error getting location", error);
+    }, {
+      enableHighAccuracy: true
     });
   }, 5000);
 }
