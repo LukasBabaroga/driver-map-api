@@ -58,5 +58,15 @@ def debug_drivers():
     return jsonify([dict(d) for d in drivers])
 
 
+@app.route('/update_location', methods=['POST'])
+def update_location():
+    data = request.json
+    conn = get_db_connection()
+    conn.execute('UPDATE drivers SET location = ? WHERE id = ?', (data['location'], data['id']))
+    conn.commit()
+    conn.close()
+    return jsonify({'status': 'updated'})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
